@@ -3,7 +3,7 @@ import { ImageKind } from "../shared/util.js";
 class ScaleJS {
   isMobile() {
     if (typeof navigator !== "undefined") {
-      return `/Mobi/.test(navigator.userAgent)`;
+      return /Mobi/.test(navigator.userAgent);
     }
     return false;
   }
@@ -58,6 +58,7 @@ class ScaleJS {
         if (imgScaleObj.transformImage) {
           imgData.kind = ImageKind.GRAYSCALE_8BPP;
           imgData.data = this.scaleBWImage(
+            imgData.data,
             imgData.width,
             imgData.height,
             (imgData.width + 7) >> 3,
@@ -70,6 +71,7 @@ class ScaleJS {
         imgScaleObj = this.needsScale(imgData.width, imgData.height, "RGB", 1);
         if (imgScaleObj.transformImage) {
           imgData.data = this.scaleRGBImage(
+            imgData.data,
             imgData.width,
             imgData.height,
             imgScaleObj.scale

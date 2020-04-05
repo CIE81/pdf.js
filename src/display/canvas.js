@@ -28,7 +28,7 @@ import {
   warn,
 } from "../shared/util.js";
 import { getShadingPatternFromIR, TilingPattern } from "./pattern_helper.js";
-import { ScaleJS } from './scale';
+import { ScaleJS } from "./scale.js";
 
 // <canvas> contexts store most of the state we need natively.
 // However, PDF needs a bit more state, which we store here.
@@ -594,28 +594,28 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
         ctx.putImageData(chunkImgData, 0, i * FULL_CHUNK_HEIGHT);
       }
     } else if (imgData.kind === ImageKind.GRAYSCALE_8BPP) {
-        // Grayscale, 8-bits per pixel.
-        thisChunkHeight = FULL_CHUNK_HEIGHT;
-        elemsInThisChunk = width * thisChunkHeight;
-        for (i = 0; i < totalChunks; i++) {
-          if (i >= fullChunks) {
-            thisChunkHeight = partialChunkHeight;
-            elemsInThisChunk = width * thisChunkHeight;
-          }
-
-          destPos = 0;
-          for (j = elemsInThisChunk; j--;) {
-            dest[destPos++] = src[srcPos];
-            dest[destPos++] = src[srcPos];
-            dest[destPos++] = src[srcPos];
-            dest[destPos++] = 255;
-            srcPos++;
-          }
-          ctx.putImageData(chunkImgData, 0, i * FULL_CHUNK_HEIGHT);
+      // Grayscale, 8-bits per pixel.
+      thisChunkHeight = FULL_CHUNK_HEIGHT;
+      elemsInThisChunk = width * thisChunkHeight;
+      for (i = 0; i < totalChunks; i++) {
+        if (i >= fullChunks) {
+          thisChunkHeight = partialChunkHeight;
+          elemsInThisChunk = width * thisChunkHeight;
         }
-      } else {
-        throw new Error(`bad image kind: ${imgData.kind}`);
+
+        destPos = 0;
+        for (j = elemsInThisChunk; j--; ) {
+          dest[destPos++] = src[srcPos];
+          dest[destPos++] = src[srcPos];
+          dest[destPos++] = src[srcPos];
+          dest[destPos++] = 255;
+          srcPos++;
+        }
+        ctx.putImageData(chunkImgData, 0, i * FULL_CHUNK_HEIGHT);
       }
+    } else {
+      throw new Error(`bad image kind: ${imgData.kind}`);
+    }
   }
 
   function putBinaryImageMask(ctx, imgData) {
@@ -641,7 +641,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
           elemsInThisChunk = width * thisChunkHeight;
         }
         destPos = 3;
-        for (j = elemsInThisChunk; j--;) {
+        for (j = elemsInThisChunk; j--; ) {
           dest[destPos] = 255 - src[srcPos];
           destPos += 4;
           srcPos++;
@@ -652,7 +652,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       // 1-bit per pixel
       for (i = 0; i < totalChunks; i++) {
         thisChunkHeight =
-          (i < fullChunks) ? FULL_CHUNK_HEIGHT : partialChunkHeight;
+          i < fullChunks ? FULL_CHUNK_HEIGHT : partialChunkHeight;
 
         // Expand the mask so it can be used by the canvas.  Any required
         // inversion has already been handled.
@@ -664,7 +664,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
               var elem = src[srcPos++];
               mask = 128;
             }
-            dest[destPos] = (elem & mask) ? 0 : 255;
+            dest[destPos] = elem & mask ? 0 : 255;
             destPos += 4;
             mask >>= 1;
           }
@@ -2248,9 +2248,9 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       scaleY,
       positions
     ) {
-        if (!imgData.scaleProcessed) {
-            imgData = new ScaleJS().scaleMask(imgData);
-        }
+      if (!imgData.scaleProcessed) {
+        imgData = new ScaleJS().scaleMask(imgData);
+      }
       var width = imgData.width;
       var height = imgData.height;
       var fillColor = this.current.fillColor;
@@ -2298,7 +2298,7 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
           image = new ScaleJS().scaleMask(image);
         }
         var width = image.width,
-            height = image.height;
+          height = image.height;
 
         var maskCanvas = this.cachedCanvases.getCanvas(
           "maskCanvas",
@@ -2371,9 +2371,9 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     paintInlineImageXObject: function CanvasGraphics_paintInlineImageXObject(
       imgData
     ) {
-        if (!imgData.scaleProcessed) {
-            imgData = new ScaleJS().scaleImg(imgData);
-        }
+      if (!imgData.scaleProcessed) {
+        imgData = new ScaleJS().scaleImg(imgData);
+      }
       var width = imgData.width;
       var height = imgData.height;
       var ctx = this.ctx;
@@ -2476,9 +2476,9 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
       imgData,
       map
     ) {
-        if (!imgData.scaleProcessed) {
-            imgData = new ScaleJS().scaleImg(imgData);
-        }
+      if (!imgData.scaleProcessed) {
+        imgData = new ScaleJS().scaleImg(imgData);
+      }
       var ctx = this.ctx;
       var w = imgData.width;
       var h = imgData.height;
